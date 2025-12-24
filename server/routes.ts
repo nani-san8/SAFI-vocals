@@ -188,13 +188,19 @@ async function processAudio(trackId: number, filePath: string) {
     // Using a known model for separation (Spleeter is common, or similar)
     // cjwbw/spleeter is a popular one on Replicate
     const output = await replicate.run(
-      "cjwbw/spleeter:47af15871b08a6875e8f3206972e213b27b38d3878b27732D2D786e0D78e1b43",
+      "lucataco/isolate-vocals:7337965761899986348ef11352e82110757d9036a445582f6e9e436214f447f5",
       {
         input: {
-          audio: fileBuffer
+          audio: "data:audio/wav;base64," + fileBuffer.toString('base64')
         }
       }
-    ) as { vocals: string; accompaniment: string };
+    ) as { vocals: string; instrumental: string };
+
+    await storage.updateTrack(trackId, {
+      status: 'completed',
+      vocalsUrl: output.vocals,
+      instrumentalUrl: output.instrumental
+    });
 
     // Output should contain URLs to the separated files
     await storage.updateTrack(trackId, {
