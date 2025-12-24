@@ -1,0 +1,144 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-display: 'Poppins', sans-serif;
+  --font-body: 'Outfit', sans-serif;
+
+  /* Darker light blue theme for singers helper */
+  --background: 210 100% 93%;
+  --foreground: 210 20% 15%;
+
+  --card: 210 100% 96%;
+  --card-foreground: 210 20% 15%;
+
+  --popover: 210 100% 93%;
+  --popover-foreground: 210 20% 15%;
+
+  --primary: 210 100% 40%;
+  --primary-foreground: 210 100% 98%;
+
+  --secondary: 210 40% 78%;
+  --secondary-foreground: 210 20% 15%;
+
+  --muted: 210 30% 68%;
+  --muted-foreground: 210 20% 40%;
+
+  --accent: 200 100% 45%; /* Darker cyan accent */
+  --accent-foreground: 210 100% 98%;
+
+  --destructive: 0 84% 55%;
+  --destructive-foreground: 210 100% 98%;
+
+  --border: 210 30% 80%;
+  --input: 210 30% 85%;
+  --ring: 210 100% 40%;
+}
+
+.dark {
+  --button-outline: rgba(0, 0, 0, .10);
+  --badge-outline: rgba(0, 0, 0, .05);
+
+  --opaque-button-border-intensity: -8;
+
+  /* Backgrounds applied on top of other backgrounds when hovered/active */
+  --elevate-1: rgba(0, 0, 0, .03);
+  --elevate-2: rgba(0, 0, 0, .08);
+
+  --background: 210 40% 15%;
+  --foreground: 210 100% 95%;
+  --border: 210 30% 25%;
+  --card: 210 40% 20%;
+  --card-foreground: 210 100% 95%;
+  --popover: 210 40% 15%;
+  --popover-foreground: 210 100% 95%;
+  --primary: 210 100% 50%;
+  --primary-foreground: 210 40% 15%;
+  --secondary: 210 50% 35%;
+  --secondary-foreground: 210 100% 95%;
+  --muted: 210 40% 35%;
+  --muted-foreground: 210 40% 70%;
+  --accent: 200 100% 50%;
+  --accent-foreground: 210 40% 15%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 210 100% 98%;
+  --input: 210 30% 30%;
+  --ring: 210 100% 50%;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased font-body;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+  }
+}
+
+/* Custom Scrollbar for a sleek look */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-background;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-muted rounded-full;
+}
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-muted-foreground/50;
+}
+
+/* Responsive utilities */
+@media (max-width: 640px) {
+  body {
+    font-size: 14px;
+  }
+  
+  h1 {
+    @apply text-lg;
+  }
+  
+  h2 {
+    @apply text-base;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  body {
+    font-size: 15px;
+  }
+}
+
+/* Center and responsive layout utilities */
+.responsive-container {
+  @apply w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+.centered-content {
+  @apply flex flex-col items-center justify-center;
+}
+
+.button-group {
+  @apply flex flex-wrap items-center justify-center gap-2 sm:gap-3;
+}
+
+/* Responsive button sizes */
+@media (max-width: 640px) {
+  .responsive-button {
+    @apply text-xs py-2 px-3;
+  }
+}
+
+@media (min-width: 641px) {
+  .responsive-button {
+    @apply text-sm py-2.5 px-4;
+  }
+}
