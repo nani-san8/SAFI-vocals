@@ -162,52 +162,48 @@ export async function registerRoutes(
 }
 
 async function processAudio(trackId: number, filePath: string) {
-  if (!process.env.REPLICATE_API_TOKEN) {
-    await storage.updateTrack(trackId, { 
-      status: 'failed', 
-      error: 'Please try again ❤️' 
-    });
-    return;
-  }
-
   try {
-    // Convert to WAV if needed
-    let processPath = filePath;
-    const ext = path.extname(filePath).toLowerCase().slice(1);
-    
-    if (SUPPORTED_FORMATS.video.includes(ext) || (SUPPORTED_FORMATS.audio.includes(ext) && ext !== 'mp3')) {
-      processPath = await convertToWav(filePath);
+    if (!process.env.REPLICATE_API_TOKEN) {
+      throw new Error("REPLICATE_API_TOKEN is missing");
     }
 
     const replicate = new Replicate({
       auth: process.env.REPLICATE_API_TOKEN,
     });
     
-    const fileBuffer = fs.readFileSync(processPath);
+    let processPath = filePath;
+    const ext = path.extname(filePath).toLowerCase().slice(1);
     
-    // Using a known model for separation (Spleeter is common, or similar)
-    // cjwbw/spleeter is a popular one on Replicate
+    // Convert to WAV if it's a video or non-mp3
+    if (SUPPORTED_FORMATS.video.includes(ext) || (SUPPORTED_FORMATS.audio.includes(ext) && ext !== 'mp3')) {
+      processPath = await convertToWav(filePath);
+    }
+
+    const fileBuffer = fs.readFileSync(processPath);
+    const base64Audio = `data:audio/wav;base64,${fileBuffer.toString('base64')}`;
+    
     const output = await replicate.run(
       "lucataco/isolate-vocals:7337965761899986348ef11352e82110757d9036a445582f6e9e436214f447f5",
       {
         input: {
-          audio: "data:audio/wav;base64," + fileBuffer.toString('base64')
+          audio: base64Audio
         }
       }
     ) as any;
 
-    await storage.updateTrack(trackId, {
-      status: 'completed',
-      vocalsUrl: output.vocals,
-      instrumentalUrl: output.instrumental
-    });
+    // Smart check for output URLs
+    const vUrl = output.vocals || (Array.isArray(output) ? output[0] : null);
+    const iUrl = output.instrumental || output.accompaniment || (Array.isArray(output) ? output[1] : null);
 
-    // Output should contain URLs to the separated files
-    await storage.updateTrack(trackId, {
-      status: 'completed',
-      vocalsUrl: output.vocals,
-      instrumentalUrl: output.accompaniment
-    });
+    if (vUrl) {
+      await storage.updateTrack(trackId, {
+        status: 'completed',
+        vocalsUrl: vUrl,
+        instrumentalUrl: iUrl
+      });
+    } else {
+      throw new Error("No output from AI");
+    }
 
   } catch (error: any) {
     console.error('Replicate error:', error);
