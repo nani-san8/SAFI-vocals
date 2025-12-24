@@ -194,7 +194,7 @@ async function processAudio(trackId: number, filePath: string) {
           audio: "data:audio/wav;base64," + fileBuffer.toString('base64')
         }
       }
-    ) as { vocals: string; instrumental: string };
+    ) as any;
 
     await storage.updateTrack(trackId, {
       status: 'completed',
